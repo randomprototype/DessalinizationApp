@@ -9,9 +9,7 @@ streamlit==1.5.0
 click==8
 """
 import streamlit as st
-import numpy as np
-from scipy.integrate import quad #Single integral
-from scipy.integrate import dblquad
+import numpy
 from PIL import Image
 from numba import njit
 #######################################################################################
