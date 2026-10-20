@@ -381,8 +381,8 @@ def main():
         col1, col2 = st.columns(2)
 
         with col1:
-            Kappa1 = st.number_input("Feed water quality parameter 1", min_value=0.0000, value=0.0014, help=r"$\kappa_1$")
-            Kappa2 = st.number_input("Feed water quality parameter 2", min_value=0.0000, value=0.0025, help=r"$\kappa_2$")
+            Kappa1 = st.number_input("Feed water quality parameter 1", min_value=0.0000, value=0.0014, help=r"$\kappa_1$",step=0.0001,format="%.4f")
+            Kappa2 = st.number_input("Feed water quality parameter 2", min_value=0.0000, value=0.0025, help=r"$\kappa_2$", step=0.0001,format="%.4f")
             Beta = st.number_input("Algae bloom dissipation rate", min_value=0.0000, value=0.026, help=r"$\beta$")
             Alpha = st.number_input("Biofouling-wear distribution parameter", min_value=0.00, value=0.65, help=r"$\alpha$")
             Gamma = st.number_input("Stochastic dependence strength", min_value=0.00, value=0.73, help=r"$\gamma$")
