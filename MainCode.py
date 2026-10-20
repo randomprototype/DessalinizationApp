@@ -46,83 +46,30 @@ def main():
                 st.session_state.num_columns -= 1
         
         st.subheader("Insert the parameter values below:")
-        col1, col2, col3 = st.columns(3)
+        col1, col2 = st.columns(2)
 
         with col1:
-            Kappa1 = st.number_input(
-                "Feed water quality parameter 1",
-                min_value=0.0, value=0.0014, help=r"$\kappa_1$"
-            )
-            Beta = st.number_input(
-                "Algae bloom dissipation rate",
-                min_value=0.0, value=0.026, help=r"$\beta$"
-            )
-            Gamma = st.number_input(
-                "Stochastic dependence strength",
-                min_value=0.0, value=0.73, help=r"$\gamma$"
-            )
-            CS = st.number_input(
-                "Vessel setup cost ($)",
-                min_value=0.0, value=200.0, help=r"$C_S$"
-            )
-            C2 = st.number_input(
-                "Cleaning 2 cost ($)",
-                min_value=0.0, value=500.0, help=r"$C_2$"
-            )
-            CP = st.number_input(
-                "Production loss cost ($/h)",
-                min_value=0.0, value=3.51, help=r"$C_P$"
-            )
+            Kappa1 = st.number_input("Feed water quality parameter 1", min_value=0.0, value=0.0014, help=r"$\kappa_1$")
+            Kappa2 = st.number_input("Feed water quality parameter 2", min_value=0.0, value=0.0025, help=r"$\kappa_2$")
+            Beta = st.number_input("Algae bloom dissipation rate", min_value=0.0, value=0.026, help=r"$\beta$")
+            Alpha = st.number_input("Biofouling-wear distribution parameter", min_value=0.0, value=0.65, help=r"$\alpha$")
+            Gamma = st.number_input("Stochastic dependence strength", min_value=0.0, value=0.73, help=r"$\gamma$")
+            R = st.number_input("System recovery", min_value=0.0, value=0.998, help=r"$R$")
+            CS = st.number_input("Vessel setup cost ($)", min_value=0.0, value=200.0, help=r"$C_S$")
+            C1 = st.number_input("Cleaning 1 cost ($)", min_value=0.0, value=400.0, help=r"$C_1$")
+            C2 = st.number_input("Cleaning 2 cost ($)", min_value=0.0, value=500.0, help=r"$C_2$")
         
         with col2:
-            Kappa2 = st.number_input(
-                "Feed water quality parameter 2",
-                min_value=0.0, value=0.0025, help=r"$\kappa_2$"
-            )
-            Alpha = st.number_input(
-                "Biofouling-wear distribution parameter",
-                min_value=0.0, value=0.65, help=r"$\alpha$"
-            )
-            R = st.number_input(
-                "System recovery",
-                min_value=0.0, value=0.998, help=r"$R$"
-            )
-            C1 = st.number_input(
-                "Cleaning 1 cost ($)",
-                min_value=0.0, value=400.0, help=r"$C_1$"
-            )
-            CR = st.number_input(
-                "Membrane replacement cost ($)",
-                min_value=0.0, value=400.0, help=r"$C_R$"
-            )
-            DD = st.number_input(
-                "Membrane access downtime (h)",
-                min_value=0.0, value=0.25, help=r"$d_D$"
-            )
+            CR = st.number_input("Membrane replacement cost ($)", min_value=0.0, value=400.0, help=r"$C_R$")
+            CD = st.number_input("Membrane removal cost ($/membrane)", min_value=0.0, value=100.0, help=r"$C_D$")
+            CP = st.number_input("Production loss cost ($/h)", min_value=0.0, value=3.51, help=r"$C_P$")
+            DD = st.number_input("Membrane access downtime (h)", min_value=0.0, value=0.25, help=r"$d_D$")
+            DR = st.number_input("Preventive replacement downtime (h)", min_value=0.0, value=3.0, help=r"$d_R$")
+            DF = st.number_input("Corrective replacement downtime (h)", min_value=0.0, value=6.0, help=r"$d_F$")
+            D1 = st.number_input("Cleaning 1 downtime (h)", min_value=0.0, value=1.0, help=r"$d_1$")
+            D2 = st.number_input("Cleaning 2 downtime (h)", min_value=0.0, value=2.0, help=r"$d_2$")
         
-        with col3:
-            CD = st.number_input(
-                "Membrane removal cost ($/membrane)",
-                min_value=0.0, value=100.0, help=r"$C_D$"
-            )
-            DR = st.number_input(
-                "Preventive replacement downtime (h)",
-                min_value=0.0, value=3.0, help=r"$d_R$"
-            )
-            DF = st.number_input(
-                "Corrective replacement downtime (h)",
-                min_value=0.0, value=6.0, help=r"$d_F$"
-            )
-            D1 = st.number_input(
-                "Cleaning 1 downtime (h)",
-                min_value=0.0, value=1.0, help=r"$d_1$"
-            )
-            D2 = st.number_input(
-                "Cleaning 2 downtime (h)",
-                min_value=0.0, value=2.0, help=r"$d_2$"
-            )
-        
-        
+        st.subheader("Insert the variable values below:")
         N=int(st.text_input("Insert the number of membranes (N)", value=8))
         FailureThreshold=st.number_input("Insert the failure threshold", min_value = 0.0, value = 3.0, help=r"$L$")
         Preventive=st.number_input("Insert the preventive threshold", min_value = 0.0, value = 2.99, help=r"$\theta_P$")
