@@ -405,11 +405,11 @@ def main():
         
         st.subheader("Insert the variable values below:")
         N=int(st.text_input("Insert the number of membranes (N)", value=8))
-        FailureThreshold=st.number_input("Insert the failure threshold", min_value = 0.0, value = 3.0, help=r"$L$")
-        Preventive=st.number_input("Insert the preventive threshold", min_value = 0.0, value = 2.99, help=r"$\theta_P$")
-        Opportunistic=st.number_input("Insert the opportunistic threshold", min_value = 0.0, value = 2.80, help=r"$\theta_O$")
-        Cleaning1=st.number_input("Insert the cleaning 1 threshold", min_value = 0.0, value = 10.00, help=r"$\theta_{C_1}$")
-        Cleaning2=st.number_input("Insert the cleaning 2 threshold", min_value = 0.0, value = 13.00, help=r"$\theta_{C_2}$")
+        FailureThreshold=st.number_input("Insert the failure threshold", min_value = 0.0000, value = 3.0000, help=r"$L$", step=0.0001,format="%.4f")
+        Preventive=st.number_input("Insert the preventive threshold", min_value = 0.0000, value = 2.9900, help=r"$\theta_P$",  step=0.0001,format="%.4f)
+        Opportunistic=st.number_input("Insert the opportunistic threshold", min_value = 0.0000, value = 2.8000, help=r"$\theta_O$",  step=0.0001,format="%.4f)
+        Cleaning1=st.number_input("Insert the cleaning 1 threshold", min_value = 0.0000, value = 10.0000, help=r"$\theta_{C_1}$",  step=0.0001,format="%.4f)
+        Cleaning2=st.number_input("Insert the cleaning 2 threshold", min_value = 0.0000, value = 13.0000, help=r"$\theta_{C_2}$",  step=0.0001,format="%.4f)
         
         botao = st.button("Get cost")
         if botao:
