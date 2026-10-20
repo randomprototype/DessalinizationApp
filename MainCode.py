@@ -13,6 +13,358 @@ import numpy as np
 from scipy.integrate import quad #Single integral
 from scipy.integrate import dblquad
 from PIL import Image
+#######################################################################################
+@njit
+def Kappat(t, Kappa1, Kappa2, Beta):
+    i = 0
+    while i < len(BloomData):
+        if BloomData[i] > t:
+            break
+        else:
+            i += 1
+    return (Kappa2 - Kappa1) * numpy.exp(-Beta * (t - BloomData[i - 1]))
+
+@njit
+def DegradationModel(OldDegradation, Kappa, Alpha, Gamma, R, Component):
+    if Component < N - 1:
+        Sum = 0.0
+        for j in range(Component + 1, N):
+            Sum += OldDegradation[j]
+
+        DeltaDegradation = (Kappa* Alpha**Component* ((Sum / (N - Component - 1)) ** (R * Gamma)))
+    else:
+        DeltaDegradation = Kappa * Alpha**Component
+
+    return OldDegradation[Component] + DeltaDegradation
+
+@njit
+def DecisionProblem(Degradations,Preventive,Opportunistic,Cleaning1,Cleaning2,Failure):
+    Actions = numpy.zeros(N + 2, dtype=numpy.int8)
+
+    # Deciding cleanings
+    if sum(Degradations) > Cleaning2:
+        Actions[0] = 2
+    elif sum(Degradations) > Cleaning1:
+        Actions[0] = 1
+
+    # Deciding preventive replacements
+    if Failure:
+        for i in range(N):
+            if Degradations[i] >= FailureThreshold:
+                Actions[i + 2] = 1
+
+        for i in range(N):
+            if Opportunistic < Degradations[i] < FailureThreshold:
+                Actions[i + 2] = 1
+    else:
+        for i in range(N):
+            if Degradations[i] >= Preventive:
+                Actions[i + 2] = 1
+                break
+
+        for i in range(N):
+            if Opportunistic < Degradations[i] < Preventive:
+                Actions[i + 2] = 1
+
+    # Deciding swappings
+    Actions[1] = 0
+    for i in range(N):
+        if Actions[i + 2] == 1:
+            Actions[1] = i + 1
+
+    return Actions
+
+@njit
+def SimulationThresholds(Preventive,Opportunistic,Cleaning1,Cleaning2,FailureThreshold,ConvergenceDays,Kappa1,Kappa2,Beta,Alpha,Gamma,R,CS,C1,C2,CR,CD,CP,DD,DR,DF,D1,D2):
+    Cost = 0.0
+    Day = 0
+
+    Degradations = numpy.ones(N, dtype=numpy.float64)
+    Actions = numpy.zeros(N + 2, dtype=numpy.int8)
+
+    while Day < BloomData[-1] + ConvergenceDays:
+
+        # Testing the preventive threshold
+        Break = False
+        for i in range(N):
+            if Degradations[i] >= Preventive:
+                Break = True
+                break
+
+        # Decision problem
+        if Break:
+            Actions = DecisionProblem(
+                Degradations, Preventive, Opportunistic,
+                Cleaning1, Cleaning2, False
+            )
+        else:
+            Actions[:] = 0
+
+        Downtime = 0.0
+        NewDegradations = Degradations.copy()
+
+        # Cleaning decisions
+        if Actions[0] == 1:
+            Cost += C1
+            Downtime += D1
+
+            for i in range(N):
+                NewDegradations[i] = (
+                    (1 - delta0) * NewDegradations[i] + delta0
+                )
+
+        elif Actions[0] == 2:
+            Cost += C2
+            Downtime += D2
+
+            for i in range(N):
+                NewDegradations[i] = (
+                    (1 - delta1) * NewDegradations[i] + delta1
+                )
+
+        # Preventive replacements
+        Setup = False
+        for i in range(2, len(Actions)):
+            if Actions[i] == 1:
+                Setup = True
+                NewDegradations[i - 2] = 1.0
+                Cost += CR
+
+        if Setup:
+            Downtime += DR
+
+        Cost += Actions[1] * CD
+        Downtime += Actions[1] * DD
+
+        if Actions[1] > 0:
+            Setup = True
+            NewDegradations[:Actions[1]] = numpy.sort(
+                NewDegradations[:Actions[1]]
+            )
+
+        Cost += CS * Setup
+        Cost += Downtime * CP
+
+        # Computing new degradations
+        Kappa = Kappat(Day, Kappa1, Kappa2, Beta)
+
+        for i in range(N):
+            Degradations[i] = DegradationModel(
+                NewDegradations, Kappa, Alpha, Gamma, R, i
+            )
+
+        # Checking failure
+        Failure = False
+        for i in range(N):
+            if Degradations[i] > FailureThreshold:
+                Failure = True
+                break
+
+        if Failure:
+            # Corrective opportunity
+            Cost += CS
+            Cost += DF * CP
+
+            Actions = DecisionProblem(
+                Degradations, Preventive, Opportunistic,
+                Cleaning1, Cleaning2, True
+            )
+
+            if Actions[0] == 1:
+                Cost += C1
+                Cost += D1 * CP
+
+                for i in range(N):
+                    Degradations[i] = (
+                        (1 - delta0) * Degradations[i] + delta0
+                    )
+
+            elif Actions[0] == 2:
+                Cost += C2
+                Cost += D2 * CP
+
+                for i in range(N):
+                    Degradations[i] = (
+                        (1 - delta1) * Degradations[i] + delta1
+                    )
+
+            for i in range(2, len(Actions)):
+                if Actions[i] == 1:
+                    Cost += CR
+                    Degradations[i - 2] = 1.0
+                    Actions[1] = max(Actions[1], i - 1)
+
+            Cost += Actions[1] * (CD + DD * CP)
+
+            Degradations[:Actions[1]] = numpy.sort(
+                Degradations[:Actions[1]]
+            )
+
+        Day += 1
+
+    return Cost
+
+def Metrics(Preventive,Opportunistic,Cleaning1,Cleaning2,FailureThreshold,ConvergenceDays,Kappa1,Kappa2,Beta,Alpha,Gamma,R,CS,C1,C2,CR,CD,CP,DD,DR,DF,D1,D2):
+    Cleanings1 = 0
+    Cleanings2 = 0
+    PreventiveActivations = 0
+
+    Preventives = [0] * N
+    Correctives = [0] * N
+    Breaks = []
+
+    OvertimeDegradations = [[1.0] for _ in range(N)]
+
+    Day = 0
+    Degradations = numpy.ones(N, dtype=numpy.float64)
+    Actions = numpy.zeros(N + 2, dtype=numpy.int8)
+
+    while Day < BloomData[-1] + ConvergenceDays:
+
+        # Testing the preventive threshold
+        Break = False
+        for i in range(N):
+            if Degradations[i] >= Preventive:
+                Break = True
+                PreventiveActivations += 1
+                break
+
+        # Decision problem
+        if Break:
+            Breaks.append(Day)
+            Actions = DecisionProblem(
+                Degradations, Preventive, Opportunistic,
+                Cleaning1, Cleaning2, False
+            )
+        else:
+            Actions[:] = 0
+
+        NewDegradations = Degradations.copy()
+
+        # Cleaning decisions
+        if Actions[0] == 1:
+            Cleanings1 += 1
+            for i in range(N):
+                NewDegradations[i] = (
+                    (1 - delta0) * NewDegradations[i] + delta0
+                )
+
+        elif Actions[0] == 2:
+            Cleanings2 += 1
+            for i in range(N):
+                NewDegradations[i] = (
+                    (1 - delta1) * NewDegradations[i] + delta1
+                )
+
+        # Preventive replacements
+        for i in range(2, len(Actions)):
+            if Actions[i] == 1:
+                Preventives[i - 2] += 1
+                NewDegradations[i - 2] = 1.0
+
+        if Actions[1] > 0:
+            NewDegradations[:Actions[1]] = numpy.sort(
+                NewDegradations[:Actions[1]]
+            )
+
+        # Computing new degradations
+        Kappa = Kappat(Day, Kappa1, Kappa2, Beta)
+
+        for i in range(N):
+            Degradations[i] = DegradationModel(
+                NewDegradations, Kappa, Alpha, Gamma, R, i
+            )
+
+        # Checking failure
+        Failure = False
+        CorrectiveComp = -1
+
+        for i in range(N):
+            if Degradations[i] > FailureThreshold:
+                Correctives[i] += 1
+                Failure = True
+                CorrectiveComp = i
+                break
+
+        if Failure:
+            Breaks.append(Day)
+
+            Actions = DecisionProblem(
+                Degradations, Preventive, Opportunistic,
+                Cleaning1, Cleaning2, True
+            )
+
+            if Actions[0] == 1:
+                Cleanings1 += 1
+                for i in range(N):
+                    Degradations[i] = (
+                        (1 - delta0) * Degradations[i] + delta0
+                    )
+
+            elif Actions[0] == 2:
+                Cleanings2 += 1
+                for i in range(N):
+                    Degradations[i] = (
+                        (1 - delta1) * Degradations[i] + delta1
+                    )
+
+            for i in range(2, len(Actions)):
+                if Actions[i] == 1:
+                    if i - 2 != CorrectiveComp:
+                        Preventives[i - 2] += 1
+
+                    Degradations[i - 2] = 1.0
+
+            Degradations[:Actions[1]] = numpy.sort(
+                Degradations[:Actions[1]]
+            )
+
+        Day += 1
+
+        for i in range(N):
+            OvertimeDegradations[i].append(Degradations[i])
+
+    # Plotting degradation trajectories
+    for Line in OvertimeDegradations:
+        plt.plot(Line, linewidth=0.75)
+
+    plt.vlines(
+        Breaks,
+        ymin=1.0 - 0.01,
+        ymax=1.0 + 0.01,
+        color="black",
+        linewidth=1.25,
+        label="Maint. Break"
+    )
+
+    plt.xlabel("Day")
+    plt.ylabel("Degradation")
+    plt.grid(True)
+    plt.legend(
+        [f"{i + 1}" for i in range(N)],
+        loc="upper left",
+        fontsize=6
+    )
+    plt.show()
+
+    print("# of Cleanings 1:", Cleanings1)
+    print("# of Cleanings 2:", Cleanings2)
+    print("# of Prev. Activations:", PreventiveActivations)
+
+    for i in range(N):
+        print(
+            f"# of preventives and correctives in {i + 1}:",
+            Preventives[i],
+            Correctives[i]
+        )
+
+    return (
+        len(Breaks),
+        Cleanings1,
+        Cleanings2,
+        sum(Preventives),
+        sum(Correctives)
+    )
 
 def main():
     #criando 3 colunas
@@ -79,7 +431,9 @@ def main():
         
         botao = st.button("Get cost")
         if botao:
-            A=45
+            ConvergenceDays=-1
+            Cost = SimulationThresholds(Preventive,Opportunistic,Cleaning1,Cleaning2,FailureThreshold,ConvergenceDays,Kappa1,Kappa2,Beta,Alpha,Gamma,R,CS,C1,C2,CR,CD,CP,DD,DR,DF,D1,D2)
+            Results = Metrics(Preventive,Opportunistic,Cleaning1,Cleaning2,FailureThreshold,ConvergenceDays,Kappa1,Kappa2,Beta,Alpha,Gamma,R,CS,C1,C2,CR,CD,CP,DD,DR,DF,D1,D2)
             
     if choice == menu[1]:
         st.header(menu[1])
@@ -88,12 +442,11 @@ def main():
         st.write("<h6 style='text-align: justify; color: Blue Jay;'>For further questions or information on finding the optimal solution, please contact one of the email addresses below.</h6>", unsafe_allow_html=True)
         
         st.write('''
-
-        v.h.r.lima@random.org.br
-        
-        c.a.v.cavalcante@random.org.br
-        
-        ''' .format(chr(948), chr(948), chr(948), chr(948), chr(948)))       
+            v.h.r.lima@random.org.br
+            
+            c.a.v.cavalcante@random.org.br
+            
+            ''' .format(chr(948), chr(948), chr(948), chr(948), chr(948)))       
     if choice==menu[2]:
         st.header(menu[2])
         
