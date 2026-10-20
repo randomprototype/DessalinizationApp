@@ -22,12 +22,12 @@ def main():
     #inserindo na coluna 2
     col2.image(foto, use_column_width=True)
     #O código abaixo centraliza e atribui cor
-    st.markdown("<h2 style='text-align: center; color: #306754;'>Hybrid Inspection and Age-Based Policy with Inspector Assignment</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; color: #306754;'>Maintenance Policy Cost Assessment for Reverse-Osmosis Desalination Systems</h2>", unsafe_allow_html=True)
     
     st.markdown("""
         <div style="background-color: #F3F3F3; padding: 10px; text-align: center;">
-          <p style="font-size: 20px; font-weight: bold;">A Delay-Time Model for Non-Periodic Inspection Intervals and Inspector Team Assignment</p>
-          <p style="font-size: 15px;">By: Victor H. R. Lima & Cristiano A. V. Cavalcante</p>
+          <p style="font-size: 20px; font-weight: bold;">Mathematical modelling of component dependencies in a multi-component system: planning maintenance of membranes in reverse-osmosis desalination</p>
+          <p style="font-size: 15px;">By: Victor H. R. Lima & Rafael G. N. Paiva & Phuc Do & Cristiano A. V. Cavalcante & Frits van Rooij & Philip Scarf</p>
         </div>
         """, unsafe_allow_html=True)
 
