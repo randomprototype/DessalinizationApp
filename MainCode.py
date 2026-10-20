@@ -368,6 +368,7 @@ def Metrics(Preventive,Opportunistic,Cleaning1,Cleaning2,FailureThreshold,Conver
     )
 
 def main():
+    global N, FailureThreshold
     #criando 3 colunas
     col1, col2, col3= st.columns(3)
     foto = Image.open('randomen.png')
