@@ -416,6 +416,22 @@ def main():
             ConvergenceDays=-1
             Cost = SimulationThresholds(Preventive,Opportunistic,Cleaning1,Cleaning2,FailureThreshold,ConvergenceDays,Kappa1,Kappa2,Beta,Alpha,Gamma,R,CS,C1,C2,CR,CD,CP,DD,DR,DF,D1,D2)
             Results = Metrics(Preventive,Opportunistic,Cleaning1,Cleaning2,FailureThreshold,ConvergenceDays,Kappa1,Kappa2,Beta,Alpha,Gamma,R,CS,C1,C2,CR,CD,CP,DD,DR,DF,D1,D2)
+            st.subheader("Results")
+            st.metric(label="Total maintenance cost ($)",value=f"${Cost:,.2f}")
+        
+            # Métricas retornadas pela função Metrics()
+            NumberBreaks, Cleanings1, Cleanings2, Preventives, Correctives = Results
+        
+            col1, col2, col3 = st.columns(3)
+        
+            col1.metric("Failures / breaks", NumberBreaks)
+            col2.metric("Cleaning 1", Cleanings1)
+            col3.metric("Cleaning 2", Cleanings2)
+        
+            col4, col5 = st.columns(2)
+        
+            col4.metric("Preventive replacements", Preventives)
+            col5.metric("Corrective replacements", Correctives)
             
     if choice == menu[1]:
         st.header(menu[1])
