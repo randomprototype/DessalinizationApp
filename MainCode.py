@@ -368,7 +368,7 @@ def Metrics(Preventive,Opportunistic,Cleaning1,Cleaning2,FailureThreshold,Conver
     )
 
 def main():
-    global N, FailureThreshold
+    global N, FailureThreshold, delta0, delta1
     #criando 3 colunas
     col1, col2, col3= st.columns(3)
     foto = Image.open('randomen.png')
@@ -412,7 +412,9 @@ def main():
             CS = st.number_input("Vessel setup cost ($)", min_value=0.0, value=200.0, help=r"$C_S$")
             C1 = st.number_input("Cleaning 1 cost ($)", min_value=0.0, value=400.0, help=r"$C_1$")
             C2 = st.number_input("Cleaning 2 cost ($)", min_value=0.0, value=500.0, help=r"$C_2$")
-        
+            CR = st.number_input("Membrane replacement cost ($)", min_value=0.0, value=400.0, help=r"$C_R$")
+            CD = st.number_input("Membrane removal cost ($/membrane)", min_value=0.0, value=100.0, help=r"$C_D$")
+            
         with col2:
             CR = st.number_input("Membrane replacement cost ($)", min_value=0.0, value=400.0, help=r"$C_R$")
             CD = st.number_input("Membrane removal cost ($/membrane)", min_value=0.0, value=100.0, help=r"$C_D$")
@@ -422,6 +424,8 @@ def main():
             DF = st.number_input("Corrective replacement downtime (h)", min_value=0.0, value=6.0, help=r"$d_F$")
             D1 = st.number_input("Cleaning 1 downtime (h)", min_value=0.0, value=1.0, help=r"$d_1$")
             D2 = st.number_input("Cleaning 2 downtime (h)", min_value=0.0, value=2.0, help=r"$d_2$")
+            delta0 = st.number_input("Cleaning 1 effect", min_value=0.0, value=0.24, help=r"$\delta_1$")
+            delta1 = st.number_input("Cleaning 2 effect", min_value=0.0, value=0.38, help=r"$\delta_2$")
         
         st.subheader("Insert the variable values below:")
         N=int(st.text_input("Insert the number of membranes (N)", value=8))
