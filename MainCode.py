@@ -13,6 +13,7 @@ import numpy as np
 from scipy.integrate import quad #Single integral
 from scipy.integrate import dblquad
 from PIL import Image
+from numba import njit
 #######################################################################################
 @njit
 def Kappat(t, Kappa1, Kappa2, Beta):
