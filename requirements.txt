@@ -4,3 +4,4 @@ streamlit
 click
 protobuf
 altair
+numba
