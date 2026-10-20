@@ -386,7 +386,7 @@ def main():
             Beta = st.number_input("Algae bloom dissipation rate", min_value=0.000, value=0.026, help=r"$\beta$", step=0.001,format="%.3f")
             Alpha = st.number_input("Biofouling-wear distribution parameter", min_value=0.00, value=0.65, help=r"$\alpha$", step=0.01,format="%.2f")
             Gamma = st.number_input("Stochastic dependence strength", min_value=0.00, value=0.73, help=r"$\gamma$", step=0.01,format="%.2f")
-            R = st.number_input("System recovery", min_value=0.000, value=0.998, help=r"$R$", step=0.001,format="%.3f")
+            R = st.number_input("System recovery", min_value=0.000000, value=0.998000, help=r"$R$", step=0.000001,format="%.6f")
             CS = st.number_input("Vessel setup cost ($)", min_value=0.0, value=200.0, help=r"$C_S$")
             C1 = st.number_input("Cleaning 1 cost ($)", min_value=0.0, value=400.0, help=r"$C_1$")
             C2 = st.number_input("Cleaning 2 cost ($)", min_value=0.0, value=500.0, help=r"$C_2$")
