@@ -413,10 +413,8 @@ def main():
             C1 = st.number_input("Cleaning 1 cost ($)", min_value=0.0, value=400.0, help=r"$C_1$")
             C2 = st.number_input("Cleaning 2 cost ($)", min_value=0.0, value=500.0, help=r"$C_2$")
             CR = st.number_input("Membrane replacement cost ($)", min_value=0.0, value=400.0, help=r"$C_R$")
-            CD = st.number_input("Membrane removal cost ($/membrane)", min_value=0.0, value=100.0, help=r"$C_D$")
-            
+        
         with col2:
-            CR = st.number_input("Membrane replacement cost ($)", min_value=0.0, value=400.0, help=r"$C_R$")
             CD = st.number_input("Membrane removal cost ($/membrane)", min_value=0.0, value=100.0, help=r"$C_D$")
             CP = st.number_input("Production loss cost ($/h)", min_value=0.0, value=3.51, help=r"$C_P$")
             DD = st.number_input("Membrane access downtime (h)", min_value=0.0, value=0.25, help=r"$d_D$")
