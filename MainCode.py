@@ -31,7 +31,7 @@ def main():
         </div>
         """, unsafe_allow_html=True)
 
-    menu = ["Cost-rate", "Information", "Website"]
+    menu = ["Cost Assessment", "Information", "Website"]
     
     choice = st.sidebar.selectbox("Select here", menu)
     
@@ -46,40 +46,24 @@ def main():
                 st.session_state.num_columns -= 1
         
         st.subheader("Insert the parameter values below:")
+        Kappa1=st.number_input("Insert the parameter 1 for feed water quality estimation", min_value = 0.0, value = 0.0014, help=r"$\kappa_1$")
+        Kappa2=st.number_input("Insert the parameter 2 for feed water quality estimation", min_value = 0.0, value = 0.0025, help=r"$\kappa_2$")
+        Beta=st.number_input("Insert the dissipation rate of the algae bloom impact", min_value = 0.0, value = 0.026, help=r"$\beta$")
+        Alpha=st.number_input("Insert the biofouling-wear distribution parameter", min_value = 0.0, value = 0.65, help=r"$\alpha$")
+        Gamma=st.number_input("Insert the strength parameter for the stochastic dependence", min_value = 0.0, value = 0.73, help=r"$\gamma$")
+        R=st.number_input("Insert the system recovery", min_value = 0.0, value = 0.998, help=r"$R$")
+        CS=st.number_input("Insert the setup cost of opening the vessel ($)", min_value = 0.0, value = 200, help=r"$C_S$")
+        C1=st.number_input("Insert the cost of cleaning 1 ($)", min_value = 0.0, value = 400, help=r"$C_1$")
+        C2=st.number_input("Insert the cost of cleaning 2 ($)", min_value = 0.0, value = 500, help=r"$C_2$")
+        CR=st.number_input("Insert the cost of replace a membrane ($)", min_value = 0.0, value = 400, help=r"$C_R$")
+        CD=st.number_input("Insert the cost of membrane removal ($/membrane)", min_value = 0.0, value = 100, help=r"$C_D$")
+        CP=st.number_input("Insert the cost by production loss per hour ($/h)", min_value = 0.0, value = 3.51, help=r"$C_P$")
+        DD=st.number_input("Insert the downtime for acessing a membrane (h)", min_value = 0.0, value = 0.25, help=r"$d_D$")
+        DR=st.number_input("Insert the downtime for a preventive replacement of a membrane (h)", min_value = 0.0, value = 3, help=r"$d_R$")
+        DF=st.number_input("Insert the downtime for corrective replacement of a membrane (h)", min_value = 0.0, value = 6, help=r"$d_F$")
+        D1=st.number_input("Insert the downtime for cleaning action 1 (h)", min_value = 0.0, value = 1, help=r"$d_1$")
+        D2=st.number_input("Insert the downtime for cleaning action 2 (h)", min_value = 0.0, value = 2, help=r"$d_2$")
         
-        Eta1=st.number_input("Insert the characteristic life of the weak component (η\u2081)", min_value = 0.0, value = 3.0, help="This parameter specifies the scale parameter for the Weibull distribution, representing the defect arrival for the weaker component.")
-        Beta1=st.number_input("Insert the shape parameter of the weak component (β\u2082)", min_value = 1.0, max_value=5.0, value = 2.5, help="This parameter specifies the shape parameter for the Weibull distribution, representing the defect arrival for the weaker component.")
-        Eta2=st.number_input("Insert the characteristic life of the strong component (η\u2081)", min_value = 3.0, value = 18.0, help="This parameter specifies the scale parameter for the Weibull distribution, representing the defect arrival for the stronger component.")
-        Beta2=st.number_input("Insert the shape parameter of the strong component (β\u2082)", min_value = 1.0, max_value=5.0, value = 5.0, help="This parameter specifies the shape parameter for the Weibull distribution, representing the defect arrival for the stronger component.")
-        p=st.number_input("Insert the mixture parameter (p)", min_value = 0.0, value = 0.10, help="This parameter indicates the proportion of the weaker component within the total population of components.")
-        Lambda=st.number_input("Insert the rate of the exponential distribution for delay-time (λ)", min_value = 0.0, value = 2.0, help="This parameter defines the rate of the Exponential distribution, which governs the transition from the defective to the failed state of a component.")
-        Cr=st.number_input("Insert cost of replacement (inspections and age-based) (C\u02b3)", min_value = 0.5, value = 1.0, help="This parameter represents the cost associated with preventive replacements, whether performed during inspections or when the age-based threshold is reached.")
-        Cf=st.number_input("Insert cost of failure (C\u1da0)", min_value = 1.0, value = 10.0, help="This parameter represents the replacement cost incurred when a component fails.")
-        
-        col1, col2 = st.columns(2)
-
-        # Botões com balões informativos, cada um em uma coluna
-        with col1:
-            st.button("Add Repairperson", on_click=add_column, help="You should add columns to the parameters of the repairperson as you want (each column is related to one repairperson).")
-        
-        with col2:
-            st.button("Remove Repairperson", on_click=remove_column)
-
-        FixedCosts=[]
-        Ci=[]
-        Alpha=[]
-        Beta=[]
-        columns = st.columns(st.session_state.num_columns)
-
-        for i, col in enumerate(columns):
-            col.write(f"**Inspector {i+1}:**") 
-            FixedCosts.append(col.number_input(f"Fixed Cost (C\u02b0)", min_value=0.0, value=0.1, key=f"FixedCosts_{i}", help="This parameter defines the cost related to the hiring of the repairperson."))
-            Ci.append(col.number_input(f"Inspection Cost (C\u2071)", min_value=0.0, value=0.15, key=f"Ci_{i}", help="This parameter represents the cost of conducting a single inspection by this repairperson."))
-            Alpha.append(col.number_input(f"False-Positive Percentage (α)", min_value=0.0, value=0.1, key=f"Alpha_{i}", help="This parameter defines the probability that, during an inspection, the repairperson will incorrectly classify a component as defective when it is actually not."))
-            Beta.append(col.number_input(f"False-Negative Percentage (ε)", min_value=0.0, value=0.05, key=f"Beta_{i}", help="This parameter defines the probability that, during an inspection, the repairperson will incorrectly classify a component as good when it is actually defective."))
-        
-        Y=[-1]
-        st.subheader("Insert the variable values below:")
         K=int(st.text_input("Insert the number of inspections (K)", value=4))
         delta=st.text_input("Insert the inspection moments (Δ), following the example below",value="2,00 4,00 8,00 10,00", key=f"Delta")
         Delta=[float(x.replace(",", ".")) for x in delta.split()]
