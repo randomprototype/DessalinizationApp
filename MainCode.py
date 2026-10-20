@@ -326,29 +326,6 @@ def Metrics(Preventive,Opportunistic,Cleaning1,Cleaning2,FailureThreshold,Conver
         for i in range(N):
             OvertimeDegradations[i].append(Degradations[i])
 
-    # Plotting degradation trajectories
-    for Line in OvertimeDegradations:
-        plt.plot(Line, linewidth=0.75)
-
-    plt.vlines(
-        Breaks,
-        ymin=1.0 - 0.01,
-        ymax=1.0 + 0.01,
-        color="black",
-        linewidth=1.25,
-        label="Maint. Break"
-    )
-
-    plt.xlabel("Day")
-    plt.ylabel("Degradation")
-    plt.grid(True)
-    plt.legend(
-        [f"{i + 1}" for i in range(N)],
-        loc="upper left",
-        fontsize=6
-    )
-    plt.show()
-
     print("# of Cleanings 1:", Cleanings1)
     print("# of Cleanings 2:", Cleanings2)
     print("# of Prev. Activations:", PreventiveActivations)
