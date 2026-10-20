@@ -132,7 +132,7 @@ def main():
         
         botao = st.button("Get cost")
         if botao:
-            
+            A=45
             
     if choice == menu[1]:
         st.header(menu[1])
