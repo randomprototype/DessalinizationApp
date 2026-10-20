@@ -52,7 +52,7 @@ def main():
         Alpha=st.number_input("Insert the biofouling-wear distribution parameter", min_value = 0.0, value = 0.65, help=r"$\alpha$")
         Gamma=st.number_input("Insert the strength parameter for the stochastic dependence", min_value = 0.0, value = 0.73, help=r"$\gamma$")
         R=st.number_input("Insert the system recovery", min_value = 0.0, value = 0.998, help=r"$R$")
-        CS=st.number_input("Insert the setup cost of opening the vessel ($)", min_value = 0.0, value = 200, help=r"$C_S$")
+        CS=st.number_input("Insert the setup cost of opening the vessel", min_value = 0.0, value = 200, help=r"$C_S$")
         C1=st.number_input("Insert the cost of cleaning 1 ($)", min_value = 0.0, value = 400, help=r"$C_1$")
         C2=st.number_input("Insert the cost of cleaning 2 ($)", min_value = 0.0, value = 500, help=r"$C_2$")
         CR=st.number_input("Insert the cost of replace a membrane ($)", min_value = 0.0, value = 400, help=r"$C_R$")
